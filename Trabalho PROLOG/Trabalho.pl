@@ -6,7 +6,6 @@ main :-
     TempoExecucao is T2 - T1,
     write('\nTempo de execucao: '), write(TempoExecucao), write(' segundos\n').
 
-
 modelo(Solucao) :- 
     Solucao = [
         (Mochila1, Nome1, Mes1, Jogo1, Materia1, Suco1),
@@ -82,3 +81,6 @@ exatamente_a_esquerda(A, B, VA, VB, Lista) :-
 
 ao_direita(A, B, VA, VB, Lista) :- 
     append(_, [( _, _, _, _, _, VB), ( _, _, _, _, _, VA)|_], Lista).
+
+
+%  swipl
