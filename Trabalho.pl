@@ -1,7 +1,8 @@
-main :-
+main :- 
     statistics(cputime, T1),
     modelo(Solucao),
     imprime_lista(Solucao),
+    fail, % Força o backtracking para tentar todas as soluções possíveis
     statistics(cputime, T2),
     TempoExecucao is T2 - T1,
     write('\nTempo de execucao: '), write(TempoExecucao), write(' segundos\n').
@@ -13,15 +14,46 @@ modelo(Solucao) :-
         (Mochila3, Nome3, Mes3, Jogo3, Materia3, Suco3),
         (Mochila4, Nome4, Mes4, Jogo4, Materia4, Suco4),
         (Mochila5, Nome5, Mes5, Jogo5, Materia5, Suco5)
-    ],
-    
+    ].
+
     % Domínios
-    Mochilas = [amarela, azul, branca, verde, vermelha],
-    Nomes = [denis, joao, lenin, otavio, will],
-    Meses = [agosto, dezembro, janeiro, maio, setembro],
-    Jogos = [tres_ou_mais, caca_palavras, cubo_vermelho, forca, problemas_logica],
-    Materias = [biologia, geografia, historia, matematica, portugues],
-    Sucos = [laranja, limao, maracuja, morango, uva],
+
+    mochila(amarela).  
+    mochila(azul).  
+    mochila(branca).  
+    mochila(verde).  
+    mochila(vermelha).  
+
+    nome(denis).  
+    nome(joao).  
+    nome(lenin).  
+    nome(otavio).  
+    nome(will).  
+
+    mes(agosto).  
+    mes(dezembro).  
+    mes(janeiro).  
+    mes(maio).  
+    mes(setembro).  
+
+    jogo(tres_ou_mais).  
+    jogo(caca_palavras).  
+    jogo(cubo_vermelho).  
+    jogo(forca).  
+    jogo(problemas_logica).  
+
+    materia(biologia).  
+    materia(geografia).  
+    materia(historia).  
+    materia(matematica).  
+    materia(portugues).  
+
+    suco(laranja).  
+    suco(limao).  
+    suco(maracuja).  
+    suco(morango).  
+    suco(uva).  
+
     
     % Restrições de valores distintos
     all_different([Mochila1, Mochila2, Mochila3, Mochila4, Mochila5]),
@@ -31,7 +63,7 @@ modelo(Solucao) :-
     all_different([Materia1, Materia2, Materia3, Materia4, Materia5]),
     all_different([Suco1, Suco2, Suco3, Suco4, Suco5]),
     
-    % Restrições do problema
+    % Restrições do problema/Fatos
     Nome5 = lenin,
     Nome4 = will,
     Nome2 = joao,
@@ -72,15 +104,18 @@ imprime_lista([H|T]) :-
     imprime_lista(T).
 
 % Regras auxiliares
-ao_lado(A, B, VA, VB, Lista) :- 
+ao_lado(VA, VB, Lista) :- 
     nextto((_, _, _, _, _, VA), (_, _, _, _, _, VB), Lista);
     nextto((_, _, _, _, _, VB), (_, _, _, _, _, VA), Lista).
 
-exatamente_a_esquerda(A, B, VA, VB, Lista) :- 
+exatamente_a_esquerda(VA, VB, Lista) :- 
     append(_, [( _, _, _, _, _, VA), ( _, _, _, _, _, VB)|_], Lista).
 
-ao_direita(A, B, VA, VB, Lista) :- 
+ao_direita(VA, VB, Lista) :- 
     append(_, [( _, _, _, _, _, VB), ( _, _, _, _, _, VA)|_], Lista).
 
-
-%  swipl
+% Definindo o predicado para garantir que os elementos sejam distintos
+alldifferent([]).
+alldifferent([H|T]) :- 
+    not(member(H, T)),
+    alldifferent(T).
