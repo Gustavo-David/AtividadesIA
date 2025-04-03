@@ -1,69 +1,42 @@
+% Definição de domínio para cada categoria
+mochilas([amarela, azul, branca, verde, vermelha]).
+nomes([denis, joao, lenin, otavio, will]).
+meses([agosto, dezembro, janeiro, maio, setembro]).
+jogos([tres_ou_mais, caca_palavras, cubo_vermelho, forca, problemas_logica]).
+materias([biologia, geografia, historia, matematica, portugues]).
+sucos([laranja, limao, maracuja, morango, uva]).
+
+% Predicado principal
 main :- 
     statistics(cputime, T1),
     modelo(Solucao),
+    write('\nSolução Encontrada:\n'),
     imprime_lista(Solucao),
-    fail, % Força o backtracking para tentar todas as soluções possíveis
     statistics(cputime, T2),
     TempoExecucao is T2 - T1,
-    write('\nTempo de execucao: '), write(TempoExecucao), write(' segundos\n').
+    write('\nTempo de execução: '), write(TempoExecucao), write(' segundos\n').
 
+% Definição do modelo lógico
 modelo(Solucao) :- 
+    mochilas(Mochilas), nomes(Nomes), meses(Meses), jogos(Jogos), materias(Materias), sucos(Sucos),
+
     Solucao = [
         (Mochila1, Nome1, Mes1, Jogo1, Materia1, Suco1),
         (Mochila2, Nome2, Mes2, Jogo2, Materia2, Suco2),
         (Mochila3, Nome3, Mes3, Jogo3, Materia3, Suco3),
         (Mochila4, Nome4, Mes4, Jogo4, Materia4, Suco4),
         (Mochila5, Nome5, Mes5, Jogo5, Materia5, Suco5)
-    ].
+    ],
 
-    % Domínios
+    % Garante que todos os elementos em cada categoria são distintos
+    permutation(Mochilas, [Mochila1, Mochila2, Mochila3, Mochila4, Mochila5]),
+    permutation(Nomes, [Nome1, Nome2, Nome3, Nome4, Nome5]),
+    permutation(Meses, [Mes1, Mes2, Mes3, Mes4, Mes5]),
+    permutation(Jogos, [Jogo1, Jogo2, Jogo3, Jogo4, Jogo5]),
+    permutation(Materias, [Materia1, Materia2, Materia3, Materia4, Materia5]),
+    permutation(Sucos, [Suco1, Suco2, Suco3, Suco4, Suco5]),
 
-    mochila(amarela).  
-    mochila(azul).  
-    mochila(branca).  
-    mochila(verde).  
-    mochila(vermelha).  
-
-    nome(denis).  
-    nome(joao).  
-    nome(lenin).  
-    nome(otavio).  
-    nome(will).  
-
-    mes(agosto).  
-    mes(dezembro).  
-    mes(janeiro).  
-    mes(maio).  
-    mes(setembro).  
-
-    jogo(tres_ou_mais).  
-    jogo(caca_palavras).  
-    jogo(cubo_vermelho).  
-    jogo(forca).  
-    jogo(problemas_logica).  
-
-    materia(biologia).  
-    materia(geografia).  
-    materia(historia).  
-    materia(matematica).  
-    materia(portugues).  
-
-    suco(laranja).  
-    suco(limao).  
-    suco(maracuja).  
-    suco(morango).  
-    suco(uva).  
-
-    
-    % Restrições de valores distintos
-    all_different([Mochila1, Mochila2, Mochila3, Mochila4, Mochila5]),
-    all_different([Nome1, Nome2, Nome3, Nome4, Nome5]),
-    all_different([Mes1, Mes2, Mes3, Mes4, Mes5]),
-    all_different([Jogo1, Jogo2, Jogo3, Jogo4, Jogo5]),
-    all_different([Materia1, Materia2, Materia3, Materia4, Materia5]),
-    all_different([Suco1, Suco2, Suco3, Suco4, Suco5]),
-    
-    % Restrições do problema/Fatos
+    % Restrições do problema
     Nome5 = lenin,
     Nome4 = will,
     Nome2 = joao,
@@ -83,39 +56,39 @@ modelo(Solucao) :-
     Mochila2 = azul,
     Mochila3 = branca,
     Mochila1 = amarela,
-    
+
     % Regras posicionais
-    ao_lado(Mes3, Suco1, setembro, laranja, Solucao),
-    ao_lado(Nome4, Jogo5, will, problemas_logica, Solucao),
-    ao_lado(Jogo3, Jogo1, forca, tres_ou_mais, Solucao),
-    ao_lado(Jogo3, Mochila5, forca, vermelha, Solucao),
-    ao_lado(Mes3, Jogo1, setembro, cubo_vermelho, Solucao),
-    exatamente_a_esquerda(Suco5, Materia5, uva, portugues, Solucao),
-    exatamente_a_esquerda(Mochila3, Nome4, branca, will, Solucao),
-    ao_direita(Suco5, Mochila2, uva, azul, Solucao),
-    
+    ao_lado(Mes3, Suco1, Solucao),
+    ao_lado(Nome4, Jogo5, Solucao),
+    ao_lado(Jogo3, Jogo1, Solucao),
+    ao_lado(Jogo3, Mochila5, Solucao),
+    ao_lado(Mes3, Jogo1, Solucao),
+    exatamente_a_esquerda(Suco5, Materia5, Solucao),
+    exatamente_a_esquerda(Mochila3, Nome4, Solucao),
+    ao_direita(Suco5, Mochila2, Solucao),
+
     % Otávio em uma das pontas
     (Nome1 = otavio; Nome5 = otavio).
 
-imprime_lista([]) :- write('\nFIM do imprime_lista\n').
-imprime_lista([H|T]) :- 
-    write('\n......................................\n'),
-    write(H), write(' : '),
+% Predicado para imprimir a solução formatada
+imprime_lista([]).
+imprime_lista([(Mochila, Nome, Mes, Jogo, Materia, Suco) | T]) :- 
+    write('\n-----------------------------------\n'),
+    write('Mochila: '), write(Mochila), write('\n'),
+    write('Nome: '), write(Nome), write('\n'),
+    write('Mês: '), write(Mes), write('\n'),
+    write('Jogo: '), write(Jogo), write('\n'),
+    write('Matéria: '), write(Materia), write('\n'),
+    write('Suco: '), write(Suco), write('\n'),
     imprime_lista(T).
 
-% Regras auxiliares
-ao_lado(VA, VB, Lista) :- 
-    nextto((_, _, _, _, _, VA), (_, _, _, _, _, VB), Lista);
-    nextto((_, _, _, _, _, VB), (_, _, _, _, _, VA), Lista).
+% Regras auxiliares para verificar posições relativas
+ao_lado(A, B, Lista) :- 
+    nextto((A, _, _, _, _, _), (B, _, _, _, _, _), Lista);
+    nextto((B, _, _, _, _, _), (A, _, _, _, _, _), Lista).
 
-exatamente_a_esquerda(VA, VB, Lista) :- 
-    append(_, [( _, _, _, _, _, VA), ( _, _, _, _, _, VB)|_], Lista).
+exatamente_a_esquerda(A, B, Lista) :- 
+    append(_, [(A, _, _, _, _, _), (B, _, _, _, _, _)|_], Lista).
 
-ao_direita(VA, VB, Lista) :- 
-    append(_, [( _, _, _, _, _, VB), ( _, _, _, _, _, VA)|_], Lista).
-
-% Definindo o predicado para garantir que os elementos sejam distintos
-alldifferent([]).
-alldifferent([H|T]) :- 
-    not(member(H, T)),
-    alldifferent(T).
+ao_direita(A, B, Lista) :- 
+    append(_, [(B, _, _, _, _, _), (A, _, _, _, _, _)|_], Lista).
